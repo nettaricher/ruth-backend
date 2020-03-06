@@ -3,3 +3,7 @@ module.exports = {
     DB_USER: 'db_user',
     DB_PASS: 'db_pass1'
 }
+
+EVENTS = {
+    SEND_LOCATION: "SEND_LOCATION"
+}
