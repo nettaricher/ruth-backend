@@ -8,7 +8,7 @@ const userCtrl = require('./controllers/userCtrl');
 const objectCtrl = require('./controllers/objectCtrl');
 const geobjectCtrl = require('./controllers/geobjectCtrl');
 const deltaCtrl = require('./controllers/deltaCtrl');
-const ctrl = require('./controllers/ctrl');
+const deployCtrl = require('./controllers/ctrl');
 
 const app = express();
 const http = require('http').createServer(app);
@@ -32,9 +32,10 @@ app.use(cors);
 /*** All routes ***/
 app.get('/health', (req,res) => res.json("available"))
 app.get('/users', userCtrl.fetchAllUsers);
-app.get('/deploy', ctrl.fetchAllDeploy);
+app.get('/deploy', deployCtrl.fetchAllDeploy);
 app.get('/objects', objectCtrl.fetchAllObjects);
 app.get('/geobject', geobjectCtrl.fetchAllGeobjects);
 app.get('/deltas', deltaCtrl.fetchAllDeltas);
+app.post('/deploy', deployCtrl.addDeploy);
 
 http.listen(port, () => console.log(`listening on port ${port}`));

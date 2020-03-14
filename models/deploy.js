@@ -1,9 +1,11 @@
 var mongoose = require('mongoose')
 
 var deploy = new mongoose.Schema({
-        timeStamp: Number,
         deployId: String,
-        coords: Number,
+        location: {
+            type: { type: String },
+            coordinates: []
+           },
         reportingUserId: String,
         additionalInfo: String,
         deployment: [
@@ -12,8 +14,14 @@ var deploy = new mongoose.Schema({
                 tag: String
             }
         ],
-        deployType: String
+        deployType: String,
+        timestamp: {
+            type: Date,
+            default: Date.now
+        }
     })
+
+deploy.index({ location: "2dsphere" })
 
 var Deploy = mongoose.model('Deploy', deploy)
 module.exports = Deploy
