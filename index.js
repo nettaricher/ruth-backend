@@ -34,8 +34,9 @@ app.get('/health', (req,res) => res.json("available"))
 app.get('/users', userCtrl.fetchAllUsers);
 app.get('/deploy', deployCtrl.fetchAllDeploy);
 app.get('/objects', objectCtrl.fetchAllObjects);
-app.get('/geobject', geobjectCtrl.fetchAllGeobjects);
-app.get('/deltas', deltaCtrl.fetchAllDeltas);
-app.post('/deploy', deployCtrl.addDeploy);
+app.get('/geobject', geobjectCtrl.fetchAllGeobjects)
+app.get('/deltas', deltaCtrl.fetchAllDeltas)
+app.post('/deploy', deployCtrl.addDeploy)
+app.post('/location', deployCtrl.fetchDeployByLocation)
 
 http.listen(port, () => console.log(`listening on port ${port}`));

@@ -30,5 +30,27 @@ module.exports = {
         .catch(err => {
             res.status(404).send(err)
         })
+    },
+
+    fetchDeployByLocation(req,res,next){
+        const {
+             long = null,
+             latt = null
+        } = req.body
+        Deploy.find({
+            location: {
+             $near: {
+              $maxDistance: 1000,
+              $geometry: {
+               type: "Point",
+               coordinates: [long, latt]
+              }
+             }
+            }
+           })
+           .find((error, results) => {
+            if (error) console.log(error);
+            res.json(results)
+           })
     }
 }
