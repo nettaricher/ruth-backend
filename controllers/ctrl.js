@@ -1,12 +1,12 @@
 const Deploy = require('../models/deploy')
-      
+const io = require('../utils/socketIO');
 module.exports = {
     //show all DeployIntell
-    fetchAllDeploy(req, res, next){         
+    fetchAllDeploy(req, res, next){
         Deploy.find({})
         .then(result => {
             res.json(result)
-        }) 
+        })
         .catch( err => {
             res.status(404).send("not found")
         })
@@ -24,8 +24,8 @@ module.exports = {
         const deploy = new Deploy({deployId, location, reportingUserId, additionalInfo, deployment, deployType})
         deploy.save()
         .then(result => {
-            res.json(result)
-            console.log("Deploy added!")
+            io.getio().emit("SEND_LOCATION", deploy)
+            res.status(201).json(result)
         })
         .catch(err => {
             res.status(404).send(err)

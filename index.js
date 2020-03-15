@@ -13,20 +13,16 @@ const deployCtrl = require('./controllers/ctrl');
 const app = express();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
-require('./utils/socketIO')(io);
-
+require('./utils/socketIO').init(io);
 
 const port = process.env.PORT || 8080;
+
 
 app.set('port', port);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(morgan('dev'));
-app.use(morgan('common', {
-  stream: fs.createWriteStream(path.join(__dirname, 'logs/reports.log'), { flags: 'a' })
-}));
-
 app.use(cors);
 
 /*** All routes ***/
