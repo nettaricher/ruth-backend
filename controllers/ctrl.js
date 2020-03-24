@@ -59,9 +59,13 @@ module.exports = {
         const {location = null} = req.body
         Deploy.updateOne({deployId: id}, {location: location})
         .then(result => {
-            console.log("Deploy updated!")
-            res.json(result)
-        }) 
+            console.log(id)
+            Deploy.findOne({deployId: id})
+            .then(deploy => {
+                io.getio().emit("SEND_LOCATION", deploy)
+                res.json(deploy)
+            })   
+        })
         .catch(err => {
             res.status(404).send("not found")
         }) 
