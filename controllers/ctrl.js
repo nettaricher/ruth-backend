@@ -52,5 +52,18 @@ module.exports = {
             if (error) console.log(error);
             res.json(results)
            })
+    },
+
+    updateDeployById(req,res,next){
+        const {id = null} = req.params
+        const {location = null} = req.body
+        Deploy.updateOne({deployId: id}, {location: location})
+        .then(result => {
+            console.log("Deploy updated!")
+            res.json(result)
+        }) 
+        .catch(err => {
+            res.status(404).send("not found")
+        }) 
     }
 }

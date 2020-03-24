@@ -34,5 +34,6 @@ app.get('/geobject', geobjectCtrl.fetchAllGeobjects)
 app.get('/deltas', deltaCtrl.fetchAllDeltas)
 app.post('/deploy', deployCtrl.addDeploy)
 app.post('/location', deployCtrl.fetchDeployByLocation)
+app.post('/deploy/update/:id', deployCtrl.updateDeployById )
 
 http.listen(port, () => console.log(`listening on port ${port}`));
