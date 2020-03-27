@@ -7,6 +7,11 @@ var deploy = new mongoose.Schema({
             coordinates: [],
             elevation: Number
            },
+        prevlocation: {
+            type: { type: String },
+            coordinates: [],
+            elevation: Number
+           },
         reportingUserId: String,
         additionalInfo: String,
         deployment: [

@@ -16,12 +16,13 @@ module.exports = {
         const{
             deployId = null,
             location = null,
+            prevlocation = null,
             reportingUserId = null,
             additionalInfo = null,
             deployment = null,
             deployType = null
         } = req.body
-        const deploy = new Deploy({deployId, location, reportingUserId, additionalInfo, deployment, deployType})
+        const deploy = new Deploy({deployId, location, prevlocation, reportingUserId, additionalInfo, deployment, deployType})
         deploy.save()
         .then(result => {
             io.getio().emit("SEND_LOCATION", deploy)
@@ -57,15 +58,20 @@ module.exports = {
     updateDeployById(req,res,next){
         const {id = null} = req.params
         const {location = null} = req.body
-        Deploy.updateOne({deployId: id}, {location: location})
-        .then(result => {
-            console.log(id)
-            Deploy.findOne({deployId: id})
+        let prev = null;
+        Deploy.findOne({deployId: id})
             .then(deploy => {
-                io.getio().emit("SEND_LOCATION", deploy)
-                res.json(deploy)
+                //console.log(deploy.location);
+                prev = deploy.location;
+                Deploy.updateOne({deployId: id}, {location: location, prevlocation: prev})
+                .then(result => {
+                    Deploy.findOne({deployId: id})
+                    .then(deploy => {
+                        io.getio().emit("SEND_LOCATION", deploy)
+                        res.json(deploy)
+                    })   
+                })
             })   
-        })
         .catch(err => {
             res.status(404).send("not found")
         }) 

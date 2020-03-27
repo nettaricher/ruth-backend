@@ -1,7 +1,6 @@
 import csv
 import requests 
 import time
-from decimal import Decimal
 
 with open('deploys.csv') as csv_file:
     csv_reader = csv.reader(csv_file, delimiter=',')
@@ -15,12 +14,12 @@ with open('deploys.csv') as csv_file:
         else:
             data = {'location': {
                 'type': 'Point',
-                'coordinates': [Decimal(row[1]),Decimal(row[2])],
-                'elevation': Decimal(row[3])
+                'coordinates': [float(row[1]), float(row[2])],
+                'elevation': float(row[3])
             }}
             r = requests.post(url = API_ENDPOINT + row[0], json= data) 
             line_count += 1
-            time.sleep(5)
+            time.sleep(6)
     print(f'Processed {line_count} lines.')
 
     
