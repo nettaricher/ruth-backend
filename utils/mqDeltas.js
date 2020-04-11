@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-
+const Deploy = require('../models/deploy')
 var amqp = require('amqplib/callback_api');
 
 amqp.connect('amqp://qfrftznl:gVWftNle39STIm0A2Gdclre7Nja4W5Qk@orangutan.rmq.cloudamqp.com/qfrftznl', function(error0, connection) {
@@ -21,7 +21,12 @@ amqp.connect('amqp://qfrftznl:gVWftNle39STIm0A2Gdclre7Nja4W5Qk@orangutan.rmq.clo
 
         channel.consume(queue, function(msg) {
             console.log(" [x] Received %s", msg.content.toString());
-        }, {
+            Deploy.find({deployId: msg.content})
+            .then(result => {
+                console.log(result)
+            })
+        }, 
+        {
             noAck: true
         });
     });
