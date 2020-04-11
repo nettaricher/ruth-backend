@@ -22,16 +22,24 @@ module.exports = {
             deployment = null,
             deployType = null
         } = req.body
-        const is_valid = true
-        const deploy = new Deploy({deployId, location, prevlocation, reportingUserId, additionalInfo, deployment, deployType, is_valid})
-        deploy.save()
+        Deploy.find({deployId: deployId})
         .then(result => {
-            io.getio().emit("SEND_LOCATION", deploy)
-            res.status(201).json(result)
-        })
-        .catch(err => {
-            res.status(404).send(err)
-        })
+            if (result.length > 0){
+                res.status(406).json({message: "Deploy id is already exist, to update please use /deploy/update/" + deployId})
+            }
+            else {
+                const is_valid = true
+                const deploy = new Deploy({deployId, location, prevlocation, reportingUserId, additionalInfo, deployment, deployType, is_valid})
+                deploy.save()
+                .then(result => {
+                    io.getio().emit("SEND_LOCATION", deploy)
+                    res.status(201).json(result)
+                })
+                .catch(err => {
+                    res.status(404).send(err)
+                })
+            }
+         })
     },
 
     fetchDeployByLocation(req,res,next){
