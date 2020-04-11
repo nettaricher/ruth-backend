@@ -24,7 +24,8 @@ var deploy = new mongoose.Schema({
         timestamp: {
             type: Date,
             default: Date.now
-        }
+        },
+        is_valid: Boolean
     })
 
 deploy.index({ location: "2dsphere" })
