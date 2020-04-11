@@ -1,3 +1,5 @@
+const publishToQueue = require('../utils/mqService')
+
 const Deploy = require('../models/deploy')
 const io = require('../utils/socketIO');
 module.exports = {
@@ -32,6 +34,7 @@ module.exports = {
                 const deploy = new Deploy({deployId, location, prevlocation, reportingUserId, additionalInfo, deployment, deployType, is_valid})
                 deploy.save()
                 .then(result => {
+                     publishToQueue("deltas-messages", "test");
                     io.getio().emit("SEND_LOCATION", deploy)
                     res.status(201).json(result)
                 })
