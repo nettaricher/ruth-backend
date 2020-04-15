@@ -34,7 +34,6 @@ module.exports = {
                 const deploy = new Deploy({deployId, location, prevlocation, reportingUserId, additionalInfo, deployment, deployType, is_valid})
                 deploy.save()
                 .then(result => {
-                     publishToQueue("deltas-messages", deployId);
                     io.getio().emit("SEND_LOCATION", deploy)
                     res.status(201).json(result)
                 })
@@ -90,6 +89,8 @@ module.exports = {
                 })
                 newDeploy.save()
                 .then(result => {
+                    console.log("publishing message to rabbit: " + result.deployId)
+                    publishToQueue("deltas-messages", result.deployId)
                     Deploy.findOne({deployId: id, is_valid: true})
                     .then(deploy => {
                         io.getio().emit("SEND_LOCATION", deploy)
@@ -100,5 +101,17 @@ module.exports = {
         .catch(err => {
             res.status(404).send("not found")
         }) 
+    },
+
+    deleteDeployById(req,res,next){
+        const {id = null} = req.params
+        Deploy.deleteMany({ is_valid:false })
+        .then(result => {
+            res.status(200).send("OK")
+        })
+        .catch(err => {
+            res.status(404).send("not found")
+        })
+
     }
 }
