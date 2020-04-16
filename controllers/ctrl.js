@@ -75,7 +75,7 @@ module.exports = {
             .then(deploy => {
                 Deploy.updateOne({deployId: id, is_valid: true}, {is_valid: false})
                 .then(result => {
-                    console.log(result)
+                    //console.log(result)
                 })
                 const newDeploy = new Deploy({
                     deployId: deploy.deployId,

@@ -7,7 +7,12 @@ with open('deploys.csv') as csv_file:
     line_count = 0
     
     API_ENDPOINT = "http://localhost:8080/deploy/update/"
+    API_DELETE = "http://localhost:8080/deploy/delete/"
+
+    ID = ""
+
     for row in csv_reader:
+        ID = row[0]
         if line_count == 0:
             print(f'Column names are {", ".join(row)}')
             line_count += 1
@@ -21,5 +26,6 @@ with open('deploys.csv') as csv_file:
             line_count += 1
             time.sleep(6)
     print(f'Processed {line_count} lines.')
+    r = requests.delete(url = API_DELETE + ID)
 
     
