@@ -2,8 +2,11 @@ var mongoose = require('mongoose')
 
 var geobject = new mongoose.Schema({
         objectId: String,
-        coords: Number,
-        radius: Number,
+        location: {
+            type: { type: String },
+            coordinates: [],
+            elevation: Number
+        },
         height: Number,
         additionalInfo: String,
         tag: [String]

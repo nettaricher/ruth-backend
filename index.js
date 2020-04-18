@@ -5,7 +5,6 @@ const db = require ('./database')
 const express = require('express')
 const cors = require('./utils/cors')
 const userCtrl = require('./controllers/userCtrl')
-const objectCtrl = require('./controllers/objectCtrl')
 const geobjectCtrl = require('./controllers/geobjectCtrl')
 const deltaCtrl = require('./controllers/deltaCtrl')
 const deployCtrl = require('./controllers/ctrl')
@@ -31,12 +30,13 @@ app.use(cors);
 app.get('/health', (req,res) => res.json("available"))
 app.get('/users', userCtrl.fetchAllUsers);
 app.get('/deploy', deployCtrl.fetchAllDeploy);
-app.get('/objects', objectCtrl.fetchAllObjects);
-app.get('/geobject', geobjectCtrl.fetchAllGeobjects)
-app.get('/deltas', deltaCtrl.fetchAllDeltas)
 app.post('/deploy', deployCtrl.addDeploy)
 app.post('/location', deployCtrl.fetchDeployByLocation)
 app.post('/deploy/update/:id', deployCtrl.updateDeployById)
 app.delete('/deploy/delete/:id', deployCtrl.deleteDeployById)
+app.get('/geobject', geobjectCtrl.fetchAllGeobjects)
+app.post('/geoObject', geobjectCtrl.addGeoObject)
+//app.patch('/geoObject/update/:id', geobjectCtrl.updateGeoObjectById)
+app.get('/deltas', deltaCtrl.fetchAllDeltas)
 
 http.listen(port, () => console.log(`listening on port ${port}`));
