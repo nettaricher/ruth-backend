@@ -10,10 +10,12 @@
   "author": "ruth team",
   "license": "ISC",
   "dependencies": {
+    "amqplib": "^0.5.5",
     "express": "4.17.1",
     "mongoose": "5.9.2",
     "morgan": "1.9.1",
     "nodemon": "2.0.2",
-    "socket.io": "2.3.0"
+    "socket.io": "2.3.0",
+    "turf": "^3.0.14"
   }
 }
