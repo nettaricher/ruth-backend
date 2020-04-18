@@ -14,15 +14,15 @@ amqp.connect('amqp://qfrftznl:gVWftNle39STIm0A2Gdclre7Nja4W5Qk@orangutan.rmq.clo
             throw error1;
         }
 
-        var queue = 'deltas-messages';
+        var queueDistance = 'deltas-distance';
 
-        channel.assertQueue(queue, {
+        channel.assertQueue(queueDistance, {
             durable: true
         });
 
-        console.log(" [*] Waiting for messages in %s. To exit press CTRL+C", queue);
+        console.log(" [*] Waiting for messages in %s. To exit press CTRL+C", queueDistance);
 
-        channel.consume(queue, function(msg) {
+        channel.consume(queueDistance, function(msg) {
             console.log(" [x] Received %s", msg.content.toString());
             Deploy.find({deployId: msg.content}).sort({timestamp: 1})
             .then(result => {
@@ -43,6 +43,82 @@ amqp.connect('amqp://qfrftznl:gVWftNle39STIm0A2Gdclre7Nja4W5Qk@orangutan.rmq.clo
                         }
                     }).catch(err => console.log(err))
                 }
+            })
+            .catch(err => {
+                console.log(err)
+            })
+        }, 
+        {
+            noAck: true
+        });
+
+        var queueSurrounding = 'deltas-surrounding';
+        channel.assertQueue(queueSurrounding, {
+            durable: true
+        });
+
+        console.log(" [*] Waiting for messages in %s. To exit press CTRL+C", queueSurrounding);
+
+        channel.consume(queueSurrounding, function(msg) {
+            console.log(" [x] Received %s", msg.content.toString());
+            Deploy.find({deployId: msg.content, is_valid: true})
+            .then(enemy => {
+                Deploy.find({deployType: "Enemy", location: {
+                    $near: {
+                        $maxDistance: 10000,
+                        $geometry:  {
+                            type: "Point",
+                            coordinates: enemy[0].location.coordinates
+                        }
+                    }
+                }, is_valid: true })
+                .then(result => {
+                    let arrayCoords = []
+                    let firstCoords = []
+                    result.forEach(enemyDeploy => {
+                        if (enemyDeploy.deployId === msg.content.toString()) {
+                            firstCoords = enemyDeploy.location.coordinates
+                        }
+                    })
+                    arrayCoords.push(firstCoords)
+                    result.forEach(enemyDeploy => {
+                        if (enemyDeploy.deployId !== msg.content.toString()) {
+                            arrayCoords.push(enemyDeploy.location.coordinates)
+                        }
+                    })
+                    arrayCoords.push(firstCoords)
+                    console.log(arrayCoords)
+                    Deploy.find({
+                        deployType: "Friendly",
+                        location: {
+                            $geoWithin: {
+                                $geometry: {
+                                    type: "Polygon",
+                                    coordinates: [arrayCoords]
+                                }
+                            }
+                        }
+                    })
+                    .then(result => {
+                        console.log(result)
+                        io.getio().emit("ENEMY_SURROUNDING",result)
+                    })
+                    .catch(err => {
+                        console.log(err)
+                        // arrayCoords.splice(0, 1)
+                        // arrayCoords.splice(arrayCoords.length - 1, 1)
+                        // console.log("----")
+                        // console.log(arrayCoords)
+                        // console.log("----")
+                        // let lastElement = arrayCoords.pop();
+                        // arrayCoords = [lastElement].concat(arrayCoords);
+                        // arrayCoords = [firstCoords].concat(arrayCoords)
+                        // arrayCoords.push(...firstCoords)
+                    })
+                })
+                .catch(err => {
+                    console.log(err)
+                })
             })
             .catch(err => {
                 console.log(err)

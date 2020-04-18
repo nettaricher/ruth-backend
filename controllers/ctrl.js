@@ -35,6 +35,9 @@ module.exports = {
                 deploy.save()
                 .then(result => {
                     io.getio().emit("SEND_LOCATION", deploy)
+                    if(deployType === "Enemy"){
+                        publishToQueue("deltas-surrounding", result.deployId)
+                    }
                     res.status(201).json(result)
                 })
                 .catch(err => {
@@ -90,7 +93,10 @@ module.exports = {
                 newDeploy.save()
                 .then(result => {
                     console.log("publishing message to rabbit: " + result.deployId)
-                    publishToQueue("deltas-messages", result.deployId)
+                    if(result.deployType === "Enemy"){
+                        publishToQueue("deltas-distance", result.deployId)
+                        publishToQueue("deltas-surrounding", result.deployId)
+                    }
                     Deploy.findOne({deployId: id, is_valid: true})
                     .then(deploy => {
                         io.getio().emit("SEND_LOCATION", deploy)
