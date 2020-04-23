@@ -41,9 +41,14 @@ module.exports = {
                     res.status(201).json(result)
                 })
                 .catch(err => {
-                    res.status(404).send(err)
+                    console.log(err)
+                    res.status(500).send(err)
                 })
             }
+         })
+         .catch(err => {
+             console.log(err)
+             res.status(500).send(err)
          })
     },
 
@@ -80,6 +85,10 @@ module.exports = {
                 .then(result => {
                     //console.log(result)
                 })
+                .catch(err => {
+                    console.log(err)
+                    res.status(500).send(err)
+                })
                 const newDeploy = new Deploy({
                     deployId: deploy.deployId,
                     location: location,
@@ -102,11 +111,19 @@ module.exports = {
                         io.getio().emit("SEND_LOCATION", deploy)
                         res.json(deploy)
                     })   
+                    .catch(err => {
+                        console.log(err)
+                        res.status(500).send(err)   
+                    })
+                })
+                .catch(err => {
+                    console.log(err)
+                    res.status(500).send(err)
                 })
             })   
-        .catch(err => {
-            res.status(404).send("not found")
-        }) 
+            .catch(err => {
+                res.status(404).send("not found")
+            }) 
     },
 
     deleteDeployById(req,res,next){

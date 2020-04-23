@@ -8,6 +8,7 @@ const userCtrl = require('./controllers/userCtrl')
 const geobjectCtrl = require('./controllers/geobjectCtrl')
 const deltaCtrl = require('./controllers/deltaCtrl')
 const deployCtrl = require('./controllers/ctrl')
+const weatherCtrl = require('./controllers/weatherCtrl')
 
 const app = express()
 const http = require('http').createServer(app)
@@ -38,5 +39,6 @@ app.get('/geobject', geobjectCtrl.fetchAllGeobjects)
 app.post('/geoObject', geobjectCtrl.addGeoObject)
 //app.patch('/geoObject/update/:id', geobjectCtrl.updateGeoObjectById)
 app.get('/deltas', deltaCtrl.fetchAllDeltas)
+app.post('/weather', weatherCtrl.fetchWeather)
 
 http.listen(port, () => console.log(`listening on port ${port}`));
