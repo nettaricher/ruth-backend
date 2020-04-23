@@ -5,8 +5,29 @@ const io = require('../utils/socketIO');
 module.exports = {
     //show all DeployIntell
     fetchAllDeploy(req, res, next){
-        Deploy.find({is_valid: true})
+        const { history = null } = req.query
+        const filter = (history === 'true') ? {} : { is_valid: true }
+        Deploy.find(filter)
         .then(result => {
+            console.log(result.length)
+            console.log(history)
+            console.log(filter)
+            res.json(result)
+        })
+        .catch( err => {
+            res.status(404).send("not found")
+        })
+    },
+
+    fetchDeployById(req, res, next){
+        const { id = null } = req.params
+        const { history = null } = req.query
+        const filter = (history === 'true') ? { deployId: id } : { deployId: id ,is_valid: true }
+        Deploy.find(filter)
+        .then(result => {
+            console.log(result.length)
+            console.log(history)
+            console.log(filter)
             res.json(result)
         })
         .catch( err => {
@@ -57,7 +78,8 @@ module.exports = {
              long = null,
              latt = null
         } = req.body
-        Deploy.find({
+        const { history = null } = req.query
+        const filter = (history === 'true') ? {
             location: {
              $near: {
               $maxDistance: 10000,
@@ -66,13 +88,27 @@ module.exports = {
                coordinates: [long, latt]
               }
              }
-            },
-            is_valid: true
-           })
-           .find((error, results) => {
-            if (error) console.log(error);
-            res.json(results)
-           })
+            }
+            } : {
+                location: {
+                 $near: {
+                  $maxDistance: 10000,
+                  $geometry: {
+                   type: "Point",
+                   coordinates: [long, latt]
+                  }
+                 }
+                },
+                is_valid: true
+            }
+        Deploy.find(filter)
+        .then(result => {
+            console.log(result.length)
+            res.status(200).json(result)
+        })
+        .catch(err => {
+            res.status(500).json(err)
+        })
     },
 
     updateDeployById(req,res,next){

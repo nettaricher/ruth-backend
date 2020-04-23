@@ -31,6 +31,7 @@ app.use(cors);
 app.get('/health', (req,res) => res.json("available"))
 app.get('/users', userCtrl.fetchAllUsers);
 app.get('/deploy', deployCtrl.fetchAllDeploy);
+app.get('/deploy/:id', deployCtrl.fetchDeployById);
 app.post('/deploy', deployCtrl.addDeploy)
 app.post('/location', deployCtrl.fetchDeployByLocation)
 app.post('/deploy/update/:id', deployCtrl.updateDeployById)
