@@ -162,11 +162,21 @@ module.exports = {
             }) 
     },
 
-    deleteDeployById(req,res,next){
-        const {id = null} = req.params
+    deleteInvalid(req,res,next){
         Deploy.deleteMany({ is_valid:false })
         .then(result => {
             res.status(200).send("OK")
+        })
+        .catch(err => {
+            res.status(404).send("not found")
+        })
+    },
+
+    deleteDeployById(req,res,next){
+        const {id = null} = req.params
+        Deploy.deleteMany({ deployId: id })
+        .then(result => {
+            res.status(200).send("Deleted")
         })
         .catch(err => {
             res.status(404).send("not found")
