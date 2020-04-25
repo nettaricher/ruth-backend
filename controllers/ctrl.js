@@ -9,9 +9,6 @@ module.exports = {
         const filter = (history === 'true') ? {} : { is_valid: true }
         Deploy.find(filter)
         .then(result => {
-            console.log(result.length)
-            console.log(history)
-            console.log(filter)
             res.json(result)
         })
         .catch( err => {
@@ -25,9 +22,6 @@ module.exports = {
         const filter = (history === 'true') ? { deployId: id } : { deployId: id ,is_valid: true }
         Deploy.find(filter)
         .then(result => {
-            console.log(result.length)
-            console.log(history)
-            console.log(filter)
             res.json(result)
         })
         .catch( err => {

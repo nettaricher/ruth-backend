@@ -14,12 +14,8 @@ var deploy = new mongoose.Schema({
            },
         reportingUserId: String,
         additionalInfo: String,
-        deployment: [
-            {
-                amount: Number,
-                tag: String
-            }
-        ],
+        amount: Number,
+        tag: String,
         deployType: String,
         timestamp: {
             type: Date,
