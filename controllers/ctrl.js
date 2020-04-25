@@ -50,7 +50,7 @@ module.exports = {
                 const deploy = new Deploy({deployId, location, prevlocation, reportingUserId, additionalInfo, amount, tag, deployType, is_valid})
                 deploy.save()
                 .then(result => {
-                    io.getio().emit("SEND_LOCATION", deploy)
+                    io.getio().emit("SEND_LOCATION", [deploy])
                     if(deployType === "Enemy"){
                         publishToQueue("deltas-surrounding", result.deployId)
                     }
