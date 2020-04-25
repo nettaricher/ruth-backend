@@ -115,35 +115,31 @@ module.exports = {
             .then(obj => {
                 Deploy.updateOne({deployId: deploy.deployId, is_valid: true}, {is_valid: false})
                 .then(result => {
-                    //console.log(result)
-                })
-                .catch(err => {
-                    console.log(err)
-                    res.status(500).send(err)
-                })
-                const newDeploy = new Deploy({
-                    deployId: deploy.deployId,
-                    location: deploy.location,
-                    prevlocation: obj.location,
-                    reportingUserId: deploy.reportingUserId,
-                    additionalInfo: deploy.additionalInfo,
-                    amount: deploy.amount,
-                    tag: deploy.tag,
-                    deployType: deploy.deployType,
-                    is_valid: true
-                })
-                newDeploy.save()
-                .then(result => {
-                    console.log("publishing message to rabbit: " + result.deployId)
-                    if(result.deployType === "Enemy"){
-                        publishToQueue("deltas-distance", result.deployId)
-                        publishToQueue("deltas-surrounding", result.deployId)
-                    }
-                    deploysArray.push(result)
-                    if(i === deploys.length-1){
-                        io.getio().emit("SEND_LOCATION", deploysArray)
-                        res.json(deploysArray)
-                    }
+                    const newDeploy = new Deploy({
+                        deployId: deploy.deployId,
+                        location: deploy.location,
+                        prevlocation: obj.location,
+                        reportingUserId: obj.reportingUserId,
+                        additionalInfo: obj.additionalInfo,
+                        amount: obj.amount,
+                        tag: obj.tag,
+                        deployType: obj.deployType,
+                        is_valid: true
+                    })
+                    console.log(newDeploy)
+                    newDeploy.save()
+                    .then(result => {
+                        console.log("publishing message to rabbit: " + result.deployId)
+                        if(result.deployType === "Enemy"){
+                            publishToQueue("deltas-distance", result.deployId)
+                            publishToQueue("deltas-surrounding", result.deployId)
+                        }
+                        deploysArray.push(result)
+                        if(i === deploys.length-1){
+                            io.getio().emit("SEND_LOCATION", deploysArray)
+                            res.json(deploysArray)
+                        }
+                    })
                 })
                 .catch(err => {
                     console.log(err)
