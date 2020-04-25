@@ -36,7 +36,8 @@ module.exports = {
             prevlocation = null,
             reportingUserId = null,
             additionalInfo = null,
-            deployment = null,
+            amount = null,
+            tag = null,
             deployType = null
         } = req.body
         Deploy.find({deployId: deployId})
@@ -46,7 +47,7 @@ module.exports = {
             }
             else {
                 const is_valid = true
-                const deploy = new Deploy({deployId, location, prevlocation, reportingUserId, additionalInfo, deployment, deployType, is_valid})
+                const deploy = new Deploy({deployId, location, prevlocation, reportingUserId, additionalInfo, amount, tag, deployType, is_valid})
                 deploy.save()
                 .then(result => {
                     io.getio().emit("SEND_LOCATION", deploy)
@@ -106,12 +107,13 @@ module.exports = {
     },
 
     updateDeployById(req,res,next){
-        const {id = null} = req.params
-        const {location = null} = req.body
+        const deploys = req.body
         let prev = null;
-        Deploy.findOne({deployId: id, is_valid: true})
-            .then(deploy => {
-                Deploy.updateOne({deployId: id, is_valid: true}, {is_valid: false})
+        let deploysArray = []
+        deploys.forEach((deploy,i) => {
+            Deploy.findOne({deployId: deploy.deployId, is_valid: true})
+            .then(obj => {
+                Deploy.updateOne({deployId: deploy.deployId, is_valid: true}, {is_valid: false})
                 .then(result => {
                     //console.log(result)
                 })
@@ -121,11 +123,12 @@ module.exports = {
                 })
                 const newDeploy = new Deploy({
                     deployId: deploy.deployId,
-                    location: location,
-                    prevlocation: deploy.location,
+                    location: deploy.location,
+                    prevlocation: obj.location,
                     reportingUserId: deploy.reportingUserId,
                     additionalInfo: deploy.additionalInfo,
-                    deployment: deploy.deployment,
+                    amount: deploy.amount,
+                    tag: deploy.tag,
                     deployType: deploy.deployType,
                     is_valid: true
                 })
@@ -136,15 +139,11 @@ module.exports = {
                         publishToQueue("deltas-distance", result.deployId)
                         publishToQueue("deltas-surrounding", result.deployId)
                     }
-                    Deploy.findOne({deployId: id, is_valid: true})
-                    .then(deploy => {
-                        io.getio().emit("SEND_LOCATION", deploy)
-                        res.json(deploy)
-                    })   
-                    .catch(err => {
-                        console.log(err)
-                        res.status(500).send(err)   
-                    })
+                    deploysArray.push(result)
+                    if(i === deploys.length-1){
+                        io.getio().emit("SEND_LOCATION", deploysArray)
+                        res.json(deploysArray)
+                    }
                 })
                 .catch(err => {
                     console.log(err)
@@ -154,6 +153,7 @@ module.exports = {
             .catch(err => {
                 res.status(404).send("not found")
             }) 
+        })
     },
 
     deleteInvalid(req,res,next){

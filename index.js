@@ -31,8 +31,8 @@ app.get('/users', userCtrl.fetchAllUsers);
 app.get('/deploy', deployCtrl.fetchAllDeploy);
 app.get('/deploy/:id', deployCtrl.fetchDeployById);
 app.post('/deploy', deployCtrl.fetchDeployByLocation)
-app.post('/deploy/update/:id', deployCtrl.updateDeployById)
-app.delete('/deploy/delete', deployCtrl.deleteInvalid)
+app.post('/deploys/update', deployCtrl.updateDeployById)
+app.delete('/deploys/delete', deployCtrl.deleteInvalid)
 app.delete('/deploy/delete/:id', deployCtrl.deleteDeployById)
 app.post('/report', deployCtrl.addDeploy)
 app.get('/geobject', geobjectCtrl.fetchAllGeobjects)
