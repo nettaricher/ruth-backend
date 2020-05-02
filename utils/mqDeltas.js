@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 const io = require('../utils/socketIO')
 const Deploy = require('../models/deploy')
+const GeoObject = require('../models/geobject')
 var amqp = require('amqplib/callback_api')
 var turf = require('turf')
 
@@ -86,8 +87,8 @@ amqp.connect('amqp://qfrftznl:gVWftNle39STIm0A2Gdclre7Nja4W5Qk@orangutan.rmq.clo
                             arrayCoords.push(enemyDeploy.location.coordinates)
                         }
                     })
+                    arrayCoords = arrayCoords.slice(0,3)
                     arrayCoords.push(firstCoords)
-                    console.log(arrayCoords)
                     Deploy.find({
                         deployType: "Friendly",
                         location: {
@@ -100,8 +101,10 @@ amqp.connect('amqp://qfrftznl:gVWftNle39STIm0A2Gdclre7Nja4W5Qk@orangutan.rmq.clo
                         }
                     })
                     .then(result => {
-                        console.log(result)
-                        io.getio().emit("ENEMY_SURROUNDING",result)
+                        if (result.length > 0) {
+                            console.log("emitting io ENEMY_SURROUNDING")
+                            io.getio().emit("ENEMY_SURROUNDING",result)
+                        }
                     })
                     .catch(err => {
                         console.log(err)
@@ -127,5 +130,69 @@ amqp.connect('amqp://qfrftznl:gVWftNle39STIm0A2Gdclre7Nja4W5Qk@orangutan.rmq.clo
         {
             noAck: true
         });
+
+        var queueSuspectBuilding = 'suspect-building';
+        channel.assertQueue(queueSuspectBuilding, {
+            durable: true
+        });
+
+        console.log(" [*] Waiting for messages in %s. To exit press CTRL+C", queueSuspectBuilding); 
+
+        channel.consume(queueSuspectBuilding, function(msg) {
+            console.log(" [x] Received %s", msg.content.toString());
+            Deploy.find({deployId: msg.content, is_valid: true})
+            .then(enemy => {
+                GeoObject.find({location: {
+                    $near: {
+                        $maxDistance: 20,
+                        $geometry:  {
+                            type: "Point",
+                            coordinates: enemy[0].location.coordinates
+                        }
+                    }
+                } })
+                .then(result => {
+                    console.log("Found " + result.length + " objects")
+                    console.log("updating " + enemy[0].deployId + " with objects")
+                    Deploy.updateOne({deployId: enemy[0].deployId, is_valid: true} , {nearObject: result})
+                    .then(res => { 
+                        //console.log("***")
+                    })
+                    .catch(err => {})
+                    let validDate = new Date(enemy[0].timestamp)
+                    Deploy.find({deployId: enemy[0].deployId, is_valid: false}).sort({timestamp: -1})
+                    .then(deploys => {
+                        console.log("comparing with " + deploys.length + " reports")
+                        let objectsIds = []
+                        deploys.forEach(element => {
+                            let invalidDate = new Date(element.timestamp)
+                            if (validDate - invalidDate > 10000) {
+                                element.nearObject.forEach(obj => {
+                                    result.forEach(validObj => {
+                                        if(validObj.objectId === obj.objectId){
+                                            objectsIds.push(validObj.objectId)
+                                        }
+                                    })
+                                })
+                            }
+                        })
+                        let objSet = new Set(objectsIds)
+                        console.log("suspicious object ids set -> ")
+                        console.log(objSet)
+                    })
+                   // io.getio().emit("ENEMY_SURROUNDING",result)
+                .catch(err => {
+                    console.log(err)
+                })
+            })
+        })
+            .catch(err => {
+                console.log(err)
+            })
+        }, 
+        {
+            noAck: true
+        });
+
     });
 });

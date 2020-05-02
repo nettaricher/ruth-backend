@@ -53,6 +53,9 @@ module.exports = {
                     io.getio().emit("SEND_LOCATION", [deploy])
                     if(deployType === "Enemy"){
                         publishToQueue("deltas-surrounding", result.deployId)
+                        if(tag === "Human"){
+                            publishToQueue("suspect-building", result.deployId)
+                        }
                     }
                     res.status(201).json(result)
                 })
@@ -126,13 +129,15 @@ module.exports = {
                         deployType: obj.deployType,
                         is_valid: true
                     })
-                    console.log(newDeploy)
                     newDeploy.save()
                     .then(result => {
                         console.log("publishing message to rabbit: " + result.deployId)
                         if(result.deployType === "Enemy"){
                             publishToQueue("deltas-distance", result.deployId)
                             publishToQueue("deltas-surrounding", result.deployId)
+                            if(result.tag === "Human"){
+                                publishToQueue("suspect-building", result.deployId)
+                            }
                         }
                         deploysArray.push(result)
                         if(i === deploys.length-1){

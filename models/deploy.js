@@ -21,6 +21,7 @@ var deploy = new mongoose.Schema({
             type: Date,
             default: Date.now
         },
+        nearObject: [],
         is_valid: Boolean
     })
 

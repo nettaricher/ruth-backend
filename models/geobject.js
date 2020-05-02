@@ -12,5 +12,7 @@ var geobject = new mongoose.Schema({
         tag: [String]
     })
 
+geobject.index( { location: "2dsphere" } )
+
 var Geobject = mongoose.model('Geobject', geobject)
 module.exports = Geobject
