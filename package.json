@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start:dev": "nodemon index.js",
+    "saveFile": "nodemon ./scripts/saveFile.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "ruth team",
@@ -13,6 +14,7 @@
     "amqplib": "^0.5.5",
     "axios": "^0.19.2",
     "express": "4.17.1",
+    "jsonfile": "6.0.1",
     "mongoose": "5.9.2",
     "morgan": "1.9.1",
     "nodemon": "2.0.2",
