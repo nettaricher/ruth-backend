@@ -74,6 +74,7 @@ amqp.connect('amqp://qfrftznl:gVWftNle39STIm0A2Gdclre7Nja4W5Qk@orangutan.rmq.clo
                     }
                 }, is_valid: true })
                 .then(result => {
+                    if (result.length < 3) { return }
                     let arrayCoords = []
                     let firstCoords = []
                     result.forEach(enemyDeploy => {
