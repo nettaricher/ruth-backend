@@ -28,6 +28,7 @@ amqp.connect('amqp://qfrftznl:gVWftNle39STIm0A2Gdclre7Nja4W5Qk@orangutan.rmq.clo
             Deploy.find({deployId: msg.content}).sort({timestamp: 1})
             .then(result => {
                 let distance = turf.distance(turf.point(result[0].location.coordinates), turf.point(result[result.length-1].location.coordinates), 'kilometers')
+                console.log(distance)
                 if(distance > DISTANCE_ALERT) {
                     console.log("tank moved 2 km or even more!!!!!!")
                     Deploy.find({deployId: "3", is_valid: true})
