@@ -110,9 +110,9 @@ module.exports = {
     },
 
     updateDeployById(req,res,next){
-        const deploys = req.body
+        const deploys = req.body;
         let prev = null;
-        let deploysArray = []
+        let deploysArray = [];
         deploys.forEach((deploy,i) => {
             Deploy.findOne({deployId: deploy.deployId, is_valid: true})
             .then(obj => {
@@ -141,10 +141,11 @@ module.exports = {
                         }
                         deploysArray.push(result)
                         if(i === deploys.length-1){
+                            console.log("sending location" + deploysArray.length)
                             io.getio().emit("SEND_LOCATION", deploysArray)
                             res.json(deploysArray)
                         }
-                    })
+                    }).catch(err => {console.log(err)})
                 })
                 .catch(err => {
                     console.log(err)

@@ -14,7 +14,7 @@ const app = express()
 const http = require('http').createServer(app)
 const io = require('socket.io')(http)
 require('./utils/socketIO').init(io)
-require('./utils/mqDeltas')
+//require('./utils/mqDeltas')
 
 const port = process.env.PORT || 8080;
 
