@@ -31,18 +31,29 @@ amqp.connect('amqp://qfrftznl:gVWftNle39STIm0A2Gdclre7Nja4W5Qk@orangutan.rmq.clo
                 console.log(distance)
                 if(distance > DISTANCE_ALERT) {
                     console.log("tank moved 2 km or even more!!!!!!")
-                    Deploy.find({deployId: "3", is_valid: true})
-                    .then(user => {
-                        console.log("distance 1:")
-                        let distance1 = turf.distance(turf.point(user[0].location.coordinates), turf.point(result[0].location.coordinates), 'kilometers')
-                        console.log(distance1)
-                        console.log("distance 2:")
-                        let distance2 = turf.distance(turf.point(user[0].location.coordinates), turf.point(result[result.length-1].location.coordinates), 'kilometers')
-                        console.log(distance2)
-                        if(distance2 < distance1){
-                            console.log("enemy is closer!!!!")
-                            io.getio().emit("ENEMY_CLOSER", result[result.length-1])
+                    Deploy.find({deployType: "Friendly", is_valid: true, location: {
+                        $near: {
+                            $maxDistance: 10000,
+                            $geometry:  {
+                                type: "Point",
+                                coordinates: result[result.length-1].location.coordinates
+                            }
                         }
+                    }})
+                    .then(users => {
+                        users.forEach(user => {
+                            console.log("distance 1:")
+                            let distance1 = turf.distance(turf.point(user.location.coordinates), turf.point(result[0].location.coordinates), 'kilometers')
+                            console.log(distance1)
+                            console.log("distance 2:")
+                            let distance2 = turf.distance(turf.point(user.location.coordinates), turf.point(result[result.length-1].location.coordinates), 'kilometers')
+                            console.log(distance2)
+                            if(distance2 < distance1){
+                                console.log("**************************")
+                                console.log("enemy is closer!!!!")
+                                io.getio().emit("ENEMY_CLOSER", result[result.length-1])
+                            }
+                        })
                     }).catch(err => console.log(err))
                 }
             })
