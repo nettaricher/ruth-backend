@@ -112,7 +112,6 @@ module.exports = {
     updateDeployById(req,res,next){
         const deploys = req.body;
         let prev = null;
-        let deploysArray = [];
         deploys.forEach((deploy,i) => {
             Deploy.findOne({deployId: deploy.deployId, is_valid: true})
             .then(obj => {
@@ -139,12 +138,8 @@ module.exports = {
                                 publishToQueue("suspect-building", result.deployId)
                             }
                         }
-                        deploysArray.push(result)
-                        if(i === deploys.length-1){
-                            console.log("sending location" + deploysArray.length)
-                            io.getio().emit("SEND_LOCATION", deploysArray)
-                            res.json(deploysArray)
-                        }
+                        console.log("sending location of " + result.deployId)
+                        io.getio().emit("SEND_LOCATION", result)
                     }).catch(err => {console.log(err)})
                 })
                 .catch(err => {
@@ -156,6 +151,7 @@ module.exports = {
                 res.status(404).send("not found")
             }) 
         })
+        res.json("ok")
     },
 
     deleteInvalid(req,res,next){
