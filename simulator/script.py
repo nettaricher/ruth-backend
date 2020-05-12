@@ -33,6 +33,6 @@ with open('deploys.csv') as csv_file:
             r = requests.post(url = API_ENDPOINT, json= data) 
             time.sleep(3)
     print(f'Processed {line_count} lines.')
-    r = requests.delete(url = API_DELETE)
+#    r = requests.delete(url = API_DELETE)
 
     
