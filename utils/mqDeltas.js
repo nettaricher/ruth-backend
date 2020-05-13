@@ -6,6 +6,7 @@ var amqp = require('amqplib/callback_api')
 var turf = require('turf')
 
 const DISTANCE_ALERT = 1
+const DELTAS = 'DELTAS-LOGS -> '
 amqp.connect('amqp://qfrftznl:gVWftNle39STIm0A2Gdclre7Nja4W5Qk@orangutan.rmq.cloudamqp.com/qfrftznl', function(error0, connection) {
     if (error0) {
         throw error0;
@@ -21,16 +22,15 @@ amqp.connect('amqp://qfrftznl:gVWftNle39STIm0A2Gdclre7Nja4W5Qk@orangutan.rmq.clo
             durable: true
         });
 
-        console.log(" [*] Waiting for messages in %s. To exit press CTRL+C", queueDistance);
+        console.log(DELTAS+" [*] Waiting for messages in %s. To exit press CTRL+C", queueDistance);
 
         channel.consume(queueDistance, function(msg) {
-            console.log(" [x] Received %s", msg.content.toString());
+            console.log(DELTAS+ " [x] Received %s", msg.content.toString());
             Deploy.find({deployId: msg.content}).sort({timestamp: 1})
             .then(result => {
                 let distance = turf.distance(turf.point(result[0].location.coordinates), turf.point(result[result.length-1].location.coordinates), 'kilometers')
-                console.log(distance)
                 if(distance > DISTANCE_ALERT) {
-                    console.log("tank moved 2 km or even more!!!!!!")
+                    console.log(`${DELTAS} Enemy ${result[0].deployId} has moved significantly! (${distance} km)`)
                     Deploy.find({deployType: "Friendly", is_valid: true, location: {
                         $near: {
                             $maxDistance: 10000,
@@ -42,16 +42,16 @@ amqp.connect('amqp://qfrftznl:gVWftNle39STIm0A2Gdclre7Nja4W5Qk@orangutan.rmq.clo
                     }})
                     .then(users => {
                         users.forEach(user => {
-                            console.log("distance 1:")
+                            console.log(`${DELTAS} Enemy distance from Friendly unit: ${user.deployId}`)
                             let distance1 = turf.distance(turf.point(user.location.coordinates), turf.point(result[0].location.coordinates), 'kilometers')
-                            console.log(distance1)
-                            console.log("distance 2:")
+                            console.log(`${DELTAS} --before: ${distance1}`)
                             let distance2 = turf.distance(turf.point(user.location.coordinates), turf.point(result[result.length-1].location.coordinates), 'kilometers')
-                            console.log(distance2)
+                            console.log(`${DELTAS} --after: ${distance2}`)
                             if(distance2 < distance1){
-                                console.log("**************************")
-                                console.log("enemy is closer!!!!")
-                                io.getio().emit("ENEMY_CLOSER", result[result.length-1])
+                                console.log(DELTAS + "**************************")
+                                console.log('\x1b[33m%s\x1b[0m', `${DELTAS} Enemy: ${result[0].deployId} is getting closer to Friendly unit: ${user.deployId}`)
+                                console.log('\x1b[33m%s\x1b[0m', `${DELTAS} Emitting ENEMY_CLOSER_${user.deployId}`);
+                                io.getio().emit("ENEMY_CLOSER_"+user.deployId, result[result.length-1])
                             }
                         })
                     }).catch(err => console.log(err))
@@ -70,10 +70,10 @@ amqp.connect('amqp://qfrftznl:gVWftNle39STIm0A2Gdclre7Nja4W5Qk@orangutan.rmq.clo
             durable: true
         });
 
-        console.log(" [*] Waiting for messages in %s. To exit press CTRL+C", queueSurrounding);
+        console.log(DELTAS+" [*] Waiting for messages in %s. To exit press CTRL+C", queueSurrounding);
 
         channel.consume(queueSurrounding, function(msg) {
-            console.log(" [x] Received %s", msg.content.toString());
+            console.log(DELTAS+" [x] Received %s", msg.content.toString());
             Deploy.find({deployId: msg.content, is_valid: true})
             .then(enemy => {
                 Deploy.find({deployType: "Enemy", location: {
@@ -115,21 +115,14 @@ amqp.connect('amqp://qfrftznl:gVWftNle39STIm0A2Gdclre7Nja4W5Qk@orangutan.rmq.clo
                     })
                     .then(result => {
                         if (result.length > 0) {
-                            console.log("emitting io ENEMY_SURROUNDING")
+                            console.log(`${DELTAS} Total friendly units surrounded: ${result.length}`)
+                            console.log('\x1b[33m%s\x1b[0m', "Emitting io ENEMY_SURROUNDING")
                             io.getio().emit("ENEMY_SURROUNDING",result)
                         }
+                        else { console.log(DELTAS + "No surrounded units")}
                     })
                     .catch(err => {
                         console.log(err)
-                        // arrayCoords.splice(0, 1)
-                        // arrayCoords.splice(arrayCoords.length - 1, 1)
-                        // console.log("----")
-                        // console.log(arrayCoords)
-                        // console.log("----")
-                        // let lastElement = arrayCoords.pop();
-                        // arrayCoords = [lastElement].concat(arrayCoords);
-                        // arrayCoords = [firstCoords].concat(arrayCoords)
-                        // arrayCoords.push(...firstCoords)
                     })
                 })
                 .catch(err => {
