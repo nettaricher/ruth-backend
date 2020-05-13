@@ -104,6 +104,7 @@ amqp.connect('amqp://qfrftznl:gVWftNle39STIm0A2Gdclre7Nja4W5Qk@orangutan.rmq.clo
                     arrayCoords.push(firstCoords)
                     Deploy.find({
                         deployType: "Friendly",
+                        is_valid: true,
                         location: {
                             $geoWithin: {
                                 $geometry: {
