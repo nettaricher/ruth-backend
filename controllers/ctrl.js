@@ -1,4 +1,4 @@
-const publishToQueue = require('../utils/mqService');
+// const publishToQueue = require('../utils/mqService');
 
 const Deploy = require('../models/deploy');
 const io = require('../utils/socketIO');
@@ -64,9 +64,9 @@ module.exports = {
             .then((result) => {
               io.getio().emit('SEND_LOCATION', [deploy]);
               if (deployType === 'Enemy') {
-                publishToQueue('deltas-surrounding', result.deployId);
+                // publishToQueue('deltas-surrounding', result.deployId);
                 if (tag === 'Human') {
-                  publishToQueue('suspect-building', result.deployId);
+                //   publishToQueue('suspect-building', result.deployId);
                 }
               }
               res.status(201).json(result);
