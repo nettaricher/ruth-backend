@@ -118,7 +118,25 @@ amqp.connect('amqp://qfrftznl:gVWftNle39STIm0A2Gdclre7Nja4W5Qk@orangutan.rmq.clo
                         if (result.length > 0) {
                             console.log(`${DELTAS} Total friendly units surrounded: ${result.length}`)
                             console.log('\x1b[33m%s\x1b[0m', "Emitting io ENEMY_SURROUNDING")
-                            io.getio().emit("ENEMY_SURROUNDING",result)
+                            io.getio().emit("ENEMY_SURROUNDING_"+result[0].deployId, result)
+
+                            Deploy.find({deployType: "Friendly", location: {
+                                $near: {
+                                    $maxDistance: 20000,
+                                    $geometry:  {
+                                        type: "Point",
+                                        coordinates: result[0].location.coordinates
+                                    }
+                                }
+                            }, is_valid: true })
+                            .then(friendlys => {
+                                friendlys.forEach(friendly => {
+                                    if(friendly.deployId != result[0].deployId){
+                                        console.log('\x1b[33m%s\x1b[0m', "Emitting io ASSIST_FRIENDLY_"+ friendly.deployId)
+                                        io.getio().emit("ASSIST_FRIENDLY_"+friendly.deployId, result[0])
+                                    }
+                                })
+                            })
                         }
                         else { console.log(DELTAS + "No surrounded units")}
                     })
