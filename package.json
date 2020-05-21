@@ -3,10 +3,14 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {
+  "scripts":  {
+    "start": "node index.js",
     "start:dev": "nodemon index.js",
     "saveFile": "nodemon ./scripts/saveFile.js",
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "engines": {
+    "node": "10.x"
   },
   "author": "ruth team",
   "license": "ISC",
