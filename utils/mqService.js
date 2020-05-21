@@ -14,3 +14,7 @@ process.on('exit', (code) => {
    ch.close();
    console.log(`Closing rabbitmq channel`);
 });
+
+process.on('error', (code) => {
+   console.log(code);
+});

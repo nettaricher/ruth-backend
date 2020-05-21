@@ -31,11 +31,12 @@ app.get('/users', userCtrl.fetchAllUsers);
 app.get('/deploy', deployCtrl.fetchAllDeploy);
 app.get('/deploy/:id', deployCtrl.fetchDeployById);
 app.post('/deploy', deployCtrl.fetchDeployByLocation)
+app.post('/deploys/update', deployCtrl.updateDeployById)
+app.delete('/deploys/delete', deployCtrl.deleteInvalid)
+app.delete('/deploy/delete/:id', deployCtrl.deleteDeployById)
 app.get('/deltas', deltaCtrl.fetchAllDeltas)
 app.get('/deltas/:id', deltaCtrl.fetchDeltasById)
 app.delete('/deltas/delete', deltaCtrl.deleteDeltas)
-app.delete('/deploys/delete', deployCtrl.deleteInvalid)
-app.delete('/deploy/delete/:id', deployCtrl.deleteDeployById)
 app.post('/report', deployCtrl.addDeploy)
 app.get('/geobject', geobjectCtrl.fetchAllGeobjects)
 app.post('/geoObject', geobjectCtrl.addGeoObject)

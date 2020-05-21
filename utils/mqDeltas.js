@@ -249,4 +249,6 @@ amqp.connect('amqp://qfrftznl:gVWftNle39STIm0A2Gdclre7Nja4W5Qk@orangutan.rmq.clo
         });
 
     });
+
+    connection.once('error', err => { console.log(err)})
 });
