@@ -1,12 +1,13 @@
 var mongoose = require('mongoose')
 
 var delta = new mongoose.Schema({
-        timeStamp: Date,
-        Id: String,
-        // relatedReports: Array,
-        distanceDelta: Number,
-        // deployDelta: Array,
-        priority: Number
+        deployId: String,
+        message: String,
+        data: [],
+        timestamp: {
+            type: Date,
+            default: Date.now
+        }
     })
 
 var Delta = mongoose.model('Delta', delta)

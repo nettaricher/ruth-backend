@@ -14,7 +14,7 @@ const app = express()
 const http = require('http').createServer(app)
 const io = require('socket.io')(http)
 require('./utils/socketIO').init(io)
-// require('./utils/mqDeltas')
+require('./utils/mqDeltas')
 
 const port = process.env.PORT || 8080;
 
@@ -31,12 +31,15 @@ app.get('/users', userCtrl.fetchAllUsers);
 app.get('/deploy', deployCtrl.fetchAllDeploy);
 app.get('/deploy/:id', deployCtrl.fetchDeployById);
 app.post('/deploy', deployCtrl.fetchDeployByLocation)
-app.post('/deploys/update', deployCtrl.updateDeployById)
+app.get('/deltas', deltaCtrl.fetchAllDeltas)
+app.get('/deltas/:id', deltaCtrl.fetchDeltasById)
+app.delete('/deltas/delete', deltaCtrl.deleteDeltas)
 app.delete('/deploys/delete', deployCtrl.deleteInvalid)
 app.delete('/deploy/delete/:id', deployCtrl.deleteDeployById)
 app.post('/report', deployCtrl.addDeploy)
 app.get('/geobject', geobjectCtrl.fetchAllGeobjects)
 app.post('/geoObject', geobjectCtrl.addGeoObject)
+app.get('/geoObject', geobjectCtrl.addGeoObject)
 //app.patch('/geoObject/update/:id', geobjectCtrl.updateGeoObjectById)
 //app.get('/deltas', deltaCtrl.fetchAllDeltas)
 app.post('/weather', weatherCtrl.fetchWeather)

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 const io = require('../utils/socketIO')
 const Deploy = require('../models/deploy')
+const Deltas = require('../models/delta')
 const GeoObject = require('../models/geobject')
 var amqp = require('amqplib/callback_api')
 var turf = require('turf')
@@ -51,7 +52,16 @@ amqp.connect('amqp://qfrftznl:gVWftNle39STIm0A2Gdclre7Nja4W5Qk@orangutan.rmq.clo
                                 console.log(DELTAS + "**************************")
                                 console.log('\x1b[33m%s\x1b[0m', `${DELTAS} Enemy: ${result[0].deployId} is getting closer to Friendly unit: ${user.deployId}`)
                                 console.log('\x1b[33m%s\x1b[0m', `${DELTAS} Emitting ENEMY_CLOSER_${user.deployId}`);
-                                io.getio().emit("ENEMY_CLOSER_"+user.deployId, result[result.length-1])
+                                let deltas = new Deltas({
+                                    deployId: `${user.deployId}`,
+                                    message: 'ENEMY_CLOSER',
+                                    data: result[result.length-1]
+                                }
+                                )
+                                deltas.save().then(res => {
+                                    io.getio().emit("ENEMY_CLOSER_"+user.deployId, result[result.length-1]);
+                                })
+                                .catch(err => { console.log(err); })
                             }
                         })
                     }).catch(err => console.log(err))
@@ -73,6 +83,7 @@ amqp.connect('amqp://qfrftznl:gVWftNle39STIm0A2Gdclre7Nja4W5Qk@orangutan.rmq.clo
         console.log(DELTAS+" [*] Waiting for messages in %s. To exit press CTRL+C", queueSurrounding);
 
         channel.consume(queueSurrounding, function(msg) {
+            let deltas;
             console.log(DELTAS+" [x] Received %s", msg.content.toString());
             Deploy.find({deployId: msg.content, is_valid: true})
             .then(enemy => {
@@ -116,9 +127,18 @@ amqp.connect('amqp://qfrftznl:gVWftNle39STIm0A2Gdclre7Nja4W5Qk@orangutan.rmq.clo
                     })
                     .then(result => {
                         if (result.length > 0) {
-                            console.log(`${DELTAS} Total friendly units surrounded: ${result.length}`)
-                            console.log('\x1b[33m%s\x1b[0m', "Emitting io ENEMY_SURROUNDING")
-                            io.getio().emit("ENEMY_SURROUNDING_"+result[0].deployId, result)
+                            deltas = new Deltas({
+                                deployId: `${result[0].deployId}`,
+                                message: 'ENEMY_SURROUNDING',
+                                data: result
+                            }
+                            )
+                            deltas.save().then(res => {
+                                console.log(`${DELTAS} Total friendly units surrounded: ${result.length}`)
+                                console.log('\x1b[33m%s\x1b[0m', "Emitting io ENEMY_SURROUNDING")
+                                io.getio().emit("ENEMY_SURROUNDING_"+result[0].deployId, result)
+                                })
+                            .catch(err => { console.log(err); })
 
                             Deploy.find({deployType: "Friendly", location: {
                                 $near: {
@@ -132,8 +152,17 @@ amqp.connect('amqp://qfrftznl:gVWftNle39STIm0A2Gdclre7Nja4W5Qk@orangutan.rmq.clo
                             .then(friendlys => {
                                 friendlys.forEach(friendly => {
                                     if(friendly.deployId != result[0].deployId){
-                                        console.log('\x1b[33m%s\x1b[0m', "Emitting io ASSIST_FRIENDLY_"+ friendly.deployId)
-                                        io.getio().emit("ASSIST_FRIENDLY_"+friendly.deployId, result[0])
+                                        deltas = new Deltas({
+                                            deployId: `${friendly.deployId}`,
+                                            message: 'ASSIST_FRIENDLY',
+                                            data: result[0]
+                                        }
+                                        )
+                                        deltas.save().then(res => {
+                                            console.log('\x1b[33m%s\x1b[0m', "Emitting io ASSIST_FRIENDLY_"+ friendly.deployId)
+                                            io.getio().emit("ASSIST_FRIENDLY_"+friendly.deployId, result[0])
+                                            })
+                                        .catch(err => { console.log(err); })
                                     }
                                 })
                             })
