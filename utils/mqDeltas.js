@@ -234,7 +234,7 @@ amqp.connect('amqp://qfrftznl:gVWftNle39STIm0A2Gdclre7Nja4W5Qk@orangutan.rmq.clo
                         console.log("suspicious object ids set -> ")
                         console.log(objSet)
                     })
-                   // io.getio().emit("ENEMY_SURROUNDING",result)
+                    io.getio().emit("SUSPECT-BUILDING",objSet)
                 .catch(err => {
                     console.log(err)
                 })
