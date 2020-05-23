@@ -127,7 +127,7 @@ amqp.connect('amqp://qfrftznl:gVWftNle39STIm0A2Gdclre7Nja4W5Qk@orangutan.rmq.clo
                     })
                     .then(result => {
                         if (result.length > 0) {
-                            var polygons = {
+                            var polygon = {
                                 "type": "FeatureCollection",
                                 "features": [
                                   {
