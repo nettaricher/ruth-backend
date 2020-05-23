@@ -1,8 +1,8 @@
 import csv
 import requests 
 import time
-API_ENDPOINT = "https://fierce-everglades-47378.herokuapp.com/deploys/update/"
-# API_ENDPOINT = "http://localhost:8080/deploys/update/"
+# API_ENDPOINT = "https://fierce-everglades-47378.herokuapp.com/deploys/update/"
+API_ENDPOINT = "http://localhost:8080/deploys/update/"
 API_DELETE = "https://fierce-everglades-47378.herokuapp.com/deploys/delete/"
 FIELDS = 4
 
