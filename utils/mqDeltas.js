@@ -142,7 +142,8 @@ amqp.connect('amqp://qfrftznl:gVWftNle39STIm0A2Gdclre7Nja4W5Qk@orangutan.rmq.clo
                                   }
                                 ]
                             }
-                            console.log("---------" +turf.area(polygon)+ "-----------") 
+                            console.log("---------" +turf.area(polygon)+ "-----------")
+                            console.log(arrayCoords) 
                             deltas = new Deltas({
                                 deployId: `${result[0].deployId}`,
                                 message: 'ENEMY_SURROUNDING',
