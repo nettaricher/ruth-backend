@@ -45,4 +45,10 @@ app.get('/geoObject', geobjectCtrl.addGeoObject)
 //app.get('/deltas', deltaCtrl.fetchAllDeltas)
 app.post('/weather', weatherCtrl.fetchWeather)
 
+app.post('/notification', (req, res) => {
+    const { content, type } = req.body;
+    io.emit('NOTIFICATION', { content, type });
+    res.end();
+  });
+
 http.listen(port, () => console.log(`listening on port ${port}`));
