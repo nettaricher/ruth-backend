@@ -132,7 +132,7 @@ amqp.connect('amqp://qfrftznl:gVWftNle39STIm0A2Gdclre7Nja4W5Qk@orangutan.rmq.clo
                                                                 [arrayCoords[0],arrayCoords[1]],
                                                                 [arrayCoords[2],arrayCoords[3]],
                                                                 [arrayCoords[4],arrayCoords[5]],
-                                                                [arrayCoords[6],arrayCoords[7]]
+                                                                [arrayCoords[0],arrayCoords[1]]
                                                             ]
                                                         ]) 
                             console.log("---------" +turf.area(polygon)+ "-----------") 
