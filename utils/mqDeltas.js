@@ -127,7 +127,21 @@ amqp.connect('amqp://qfrftznl:gVWftNle39STIm0A2Gdclre7Nja4W5Qk@orangutan.rmq.clo
                     })
                     .then(result => {
                         if (result.length > 0) {
-                            let polygon = turf.polygon([arrayCoords])
+                            var polygons = {
+                                "type": "FeatureCollection",
+                                "features": [
+                                  {
+                                    "type": "Feature",
+                                    "properties": {},
+                                    "geometry": {
+                                      "type": "Polygon",
+                                      "coordinates": [[
+                                        arrayCoords
+                                      ]]
+                                    }
+                                  }
+                                ]
+                            }
                             console.log("---------" +turf.area(polygon)+ "-----------") 
                             deltas = new Deltas({
                                 deployId: `${result[0].deployId}`,
