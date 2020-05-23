@@ -127,6 +127,8 @@ amqp.connect('amqp://qfrftznl:gVWftNle39STIm0A2Gdclre7Nja4W5Qk@orangutan.rmq.clo
                     })
                     .then(result => {
                         if (result.length > 0) {
+                            let polygon = turf.polygon(arrayCoords) 
+                            console.log("---------" +turf.area(polygon)+ "-----------") 
                             deltas = new Deltas({
                                 deployId: `${result[0].deployId}`,
                                 message: 'ENEMY_SURROUNDING',
@@ -139,7 +141,6 @@ amqp.connect('amqp://qfrftznl:gVWftNle39STIm0A2Gdclre7Nja4W5Qk@orangutan.rmq.clo
                                 io.getio().emit("ENEMY_SURROUNDING_"+result[0].deployId, result)
                                 })
                             .catch(err => { console.log(err); })
-
                             Deploy.find({deployType: "Friendly", location: {
                                 $near: {
                                     $maxDistance: 20000,
