@@ -127,7 +127,7 @@ amqp.connect('amqp://qfrftznl:gVWftNle39STIm0A2Gdclre7Nja4W5Qk@orangutan.rmq.clo
                     })
                     .then(result => {
                         if (result.length > 0) {
-                            let polygon = turf.polygon(arrayCoords) 
+                            let polygon = turf.polygon([[[arrayCoords[0],arrayCoords[1]],[arrayCoords[2],arrayCoords[3]],[arrayCoords[4],arrayCoords[5]]]]) 
                             console.log("---------" +turf.area(polygon)+ "-----------") 
                             deltas = new Deltas({
                                 deployId: `${result[0].deployId}`,
