@@ -153,7 +153,7 @@ amqp.connect('amqp://qfrftznl:gVWftNle39STIm0A2Gdclre7Nja4W5Qk@orangutan.rmq.clo
                             deltas.save().then(res => {
                                 console.log(`${DELTAS} Total friendly units surrounded: ${result.length}`)
                                 console.log('\x1b[33m%s\x1b[0m', "Emitting io ENEMY_SURROUNDING")
-                                io.getio().emit("ENEMY_SURROUNDING_"+result[0].deployId, result)
+                                io.getio().emit("ENEMY_SURROUNDING_"+result[0].deployId, {surrounded: result, area: area})
                                 })
                             .catch(err => { console.log(err); })
                             Deploy.find({deployType: "Friendly", location: {
