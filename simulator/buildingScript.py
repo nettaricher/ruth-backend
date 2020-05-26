@@ -31,9 +31,8 @@ with open('building.csv') as csv_file:
             print("Sending update deploy:")
             print(data)
             r = requests.post(url = API_ENDPOINT, json= data) 
-            if(line_count == 1){
+            if(line_count == 1)
                 time.sleep(4)
-            }
             time.sleep(3)
     print(f'Processed {line_count} lines.')
 
