@@ -249,7 +249,10 @@ amqp.connect('amqp://qfrftznl:gVWftNle39STIm0A2Gdclre7Nja4W5Qk@orangutan.rmq.clo
                         let objSet = new Set(objectsIds)
                         console.log("suspicious object ids set -> ")
                         console.log(objSet)
-                        io.getio().emit("SUSPECT-BUILDING",objSet)
+                        if (objSet.length > 0) {
+                            console.log('\x1b[33m%s\x1b[0m', "Emitting io SUSPECT-BUILDING")
+                            io.getio().emit("SUSPECT-BUILDING",objSet)
+                        }
                     })
                 .catch(err => {
                     console.log(err)
