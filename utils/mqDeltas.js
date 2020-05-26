@@ -236,7 +236,7 @@ amqp.connect('amqp://qfrftznl:gVWftNle39STIm0A2Gdclre7Nja4W5Qk@orangutan.rmq.clo
                         let objectsIds = []
                         deploys.forEach(element => {
                             let invalidDate = new Date(element.timestamp)
-                            if (validDate - invalidDate > 10000) {
+                            if (validDate - invalidDate > 600000) {
                                 element.nearObject.forEach(obj => {
                                     result.forEach(validObj => {
                                         if(validObj.objectId === obj.objectId){
@@ -249,8 +249,8 @@ amqp.connect('amqp://qfrftznl:gVWftNle39STIm0A2Gdclre7Nja4W5Qk@orangutan.rmq.clo
                         let objSet = new Set(objectsIds)
                         console.log("suspicious object ids set -> ")
                         console.log(objSet)
+                        io.getio().emit("SUSPECT-BUILDING",objSet)
                     })
-                    io.getio().emit("SUSPECT-BUILDING",objSet)
                 .catch(err => {
                     console.log(err)
                 })
