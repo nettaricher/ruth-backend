@@ -6,6 +6,10 @@ API_ENDPOINT = "https://fierce-everglades-47378.herokuapp.com/deploys/update/"
 API_DELETE = "https://fierce-everglades-47378.herokuapp.com/deploys/delete/"
 FIELDS = 4
 
+value = input("Please choose mode: ")
+if value == '1':
+    input("press enter to continue...")
+
 with open('deploys.csv') as csv_file:
     csv_reader = csv.reader(csv_file, delimiter=',')
     line_count = 0
@@ -30,6 +34,9 @@ with open('deploys.csv') as csv_file:
                 j += 4
             print("Sending update deploy:")
             print(data)
+            print(value)
+            if value == '1':
+                input("press enter to continue...")
             r = requests.post(url = API_ENDPOINT, json= data) 
             time.sleep(3)
     print(f'Processed {line_count} lines.')
