@@ -3,6 +3,7 @@ const io = require('../utils/socketIO')
 const Deploy = require('../models/deploy')
 const Deltas = require('../models/delta')
 const GeoObject = require('../models/geobject')
+const calculateBearings = require('../utils/bearings')
 var amqp = require('amqplib/callback_api')
 var turf = require('turf')
 
@@ -43,6 +44,18 @@ amqp.connect('amqp://qfrftznl:gVWftNle39STIm0A2Gdclre7Nja4W5Qk@orangutan.rmq.clo
                     }})
                     .then(users => {
                         users.forEach(user => {
+                            userDirection = calculateBearings(
+                                parseFloat(user.prevlocation.coordinates[0]),parseFloat(user.prevlocation.coordinates[1]),
+                                parseFloat(user.location.coordinates[0]),parseFloat(user.location.coordinates[1])
+                            )
+                            enemyDirection = calculateBearings(
+                                parseFloat(user.location.coordinates[0]),parseFloat(user.location.coordinates[1]),
+                                parseFloat(result[result.length-1].location.coordinates[0]),parseFloat(result[result.length-1].location.coordinates[1])
+                            )
+                            bearing = userDirection - enemyDirection
+                            console.log("-------(*)()() USER DIRECTION: " + userDirection)
+                            console.log("-------()(*)() ENEMY DIRECTION: " + enemyDirection)
+                            console.log("-------()()(*) BEARINGS: " + bearing)
                             console.log(`${DELTAS} Enemy distance from Friendly unit: ${user.deployId}`)
                             let distance1 = turf.distance(turf.point(user.location.coordinates), turf.point(result[0].location.coordinates), 'kilometers')
                             console.log(`${DELTAS} --before: ${distance1}`)
@@ -55,11 +68,11 @@ amqp.connect('amqp://qfrftznl:gVWftNle39STIm0A2Gdclre7Nja4W5Qk@orangutan.rmq.clo
                                 let deltas = new Deltas({
                                     deployId: `${user.deployId}`,
                                     message: 'ENEMY_CLOSER',
-                                    data: result[result.length-1]
+                                    data: {enemy: result[result.length-1], bearing: bearing}
                                 }
                                 )
                                 deltas.save().then(res => {
-                                    io.getio().emit("ENEMY_CLOSER_"+user.deployId, result[result.length-1]);
+                                    io.getio().emit("ENEMY_CLOSER_"+user.deployId, {enemy: result[result.length-1], bearing: bearing});
                                 })
                                 .catch(err => { console.log(err); })
                             }
