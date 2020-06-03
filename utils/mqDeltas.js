@@ -68,7 +68,7 @@ amqp.connect('amqp://qfrftznl:gVWftNle39STIm0A2Gdclre7Nja4W5Qk@orangutan.rmq.clo
                                 let deltas = new Deltas({
                                     deployId: `${user.deployId}`,
                                     message: 'ENEMY_CLOSER',
-                                    data: {enemy: result[result.length-1], bearing: bearing}
+                                    data: [{enemy: result[result.length-1], bearing: bearing}]
                                 }
                                 )
                                 deltas.save().then(res => {
@@ -184,7 +184,7 @@ amqp.connect('amqp://qfrftznl:gVWftNle39STIm0A2Gdclre7Nja4W5Qk@orangutan.rmq.clo
                                         deltas = new Deltas({
                                             deployId: `${friendly.deployId}`,
                                             message: 'ASSIST_FRIENDLY',
-                                            data: result[0]
+                                            data: [result[0]]
                                         }
                                         )
                                         deltas.save().then(res => {
