@@ -1,15 +1,16 @@
 import csv
 import requests 
 import time
-# API_ENDPOINT_UPDATE = "https://fierce-everglades-47378.herokuapp.com/deploys/update/"
-API_ENDPOINT_ADD = "http://localhost:8080/report/"
-API_ENDPOINT_UPDATE = "http://localhost:8080/deploys/update/"
+API_ENDPOINT_UPDATE = "https://fierce-everglades-47378.herokuapp.com/deploys/update/"
+API_ENDPOINT_ADD = "https://fierce-everglades-47378.herokuapp.com/report/"
+# API_ENDPOINT_ADD = "http://localhost:8080/report/"
+# API_ENDPOINT_UPDATE = "http://localhost:8080/deploys/update/"
 API_DELETE = "https://fierce-everglades-47378.herokuapp.com/deploys/delete/"
 FIELDS = 5
 
 value = input("Please choose mode: ")
 
-with open('deploys.csv') as csv_file:
+with open('deploys1.csv') as csv_file:
     csv_reader = csv.reader(csv_file, delimiter=',')
     line_count = 0
 

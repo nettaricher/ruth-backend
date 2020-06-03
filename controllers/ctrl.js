@@ -149,7 +149,7 @@ module.exports = {
                 .save()
                 .then((result) => {
                   console.log('publishing message to rabbit: ' + result.deployId);
-                  if (result.deployType === 'Enemy') {
+                  if ((result.deployType === 'Enemy') || (result.deployType === 'EnemyHuman')){
                     publishToQueue('deltas-distance', result.deployId);
                     publishToQueue('deltas-surrounding', result.deployId);
                     if (result.tag === 'Human') {
