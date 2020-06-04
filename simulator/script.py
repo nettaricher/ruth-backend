@@ -6,11 +6,13 @@ API_ENDPOINT_ADD = "https://fierce-everglades-47378.herokuapp.com/report/"
 # API_ENDPOINT_ADD = "http://localhost:8080/report/"
 # API_ENDPOINT_UPDATE = "http://localhost:8080/deploys/update/"
 API_DELETE = "https://fierce-everglades-47378.herokuapp.com/deploys/delete/"
+API_DELTAS_DELETE = "https://fierce-everglades-47378.herokuapp.com/deltas/delete/"
 FIELDS = 5
+REPORTS_CSV = "deploys.csv"
 
 value = input("Please choose mode: ")
 
-with open('deploys1.csv') as csv_file:
+with open(REPORTS_CSV) as csv_file:
     csv_reader = csv.reader(csv_file, delimiter=',')
     line_count = 0
 
@@ -18,10 +20,13 @@ with open('deploys1.csv') as csv_file:
         if line_count == 0:
             print(f'Column names are {", ".join(row)}')
             line_count += 1
+            print("removing old deltas......")
+            remove = requests.delete(url = API_DELTAS_DELETE)
+            print(remove)
         else:
             j = 0
             data = []
-            if row[4] == "UPDATE":
+            if row[4 + j] == "UPDATE":
                 for i in range(int(len(row) / FIELDS)): 
                     data.append({
                         'location': {
@@ -31,8 +36,8 @@ with open('deploys1.csv') as csv_file:
                         },
                         "deployId": row[j]
                     })
-                    line_count += 1
                     j += 5
+                line_count += 1
                 print("Sending update deploy:")
                 print(data)
                 if value == '1':
@@ -61,6 +66,12 @@ with open('deploys1.csv') as csv_file:
                 r = requests.post(url = API_ENDPOINT_ADD, json= data_to_add) 
                 print(r.text)
                 time.sleep(3)
+        print("****")
+        print(line_count)
+        if line_count == 2:
+            print("deleting old reports......")
+            remove = requests.delete(url = API_DELETE)
+            print(remove)
     print(f'Processed {line_count} lines.')
 #    r = requests.delete(url = API_DELETE)
 
