@@ -68,11 +68,11 @@ amqp.connect('amqp://qfrftznl:gVWftNle39STIm0A2Gdclre7Nja4W5Qk@orangutan.rmq.clo
                                 let deltas = new Deltas({
                                     deployId: `${user.deployId}`,
                                     message: 'ENEMY_CLOSER',
-                                    data: [{enemy: result[result.length-1], bearing: bearing}]
+                                    data: [{enemy: result[result.length-1], bearing: bearing, distance: distance2}]
                                 }
                                 )
                                 deltas.save().then(res => {
-                                    io.getio().emit("ENEMY_CLOSER_"+user.deployId, {enemy: result[result.length-1], bearing: bearing});
+                                    io.getio().emit("ENEMY_CLOSER_"+user.deployId, {enemy: result[result.length-1], bearing: bearing, distance: distance2});
                                 })
                                 .catch(err => { console.log(err); })
                             }
