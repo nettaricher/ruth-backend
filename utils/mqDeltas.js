@@ -73,6 +73,7 @@ amqp.connect('amqp://qfrftznl:gVWftNle39STIm0A2Gdclre7Nja4W5Qk@orangutan.rmq.clo
                                 )
                                 deltas.save().then(res => {
                                     io.getio().emit("ENEMY_CLOSER_"+user.deployId, {enemy: result[result.length-1], bearing: bearing, distance: distance2});
+                                    console.log('\x1b[33m%s\x1b[0m',"ENEMY_CLOSER_"+user.deployId + " bearing - " + bearing)
                                 })
                                 .catch(err => { console.log(err); })
                             }
