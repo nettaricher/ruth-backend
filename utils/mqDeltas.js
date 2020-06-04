@@ -65,6 +65,7 @@ amqp.connect('amqp://qfrftznl:gVWftNle39STIm0A2Gdclre7Nja4W5Qk@orangutan.rmq.clo
                                 console.log(DELTAS + "**************************")
                                 console.log('\x1b[33m%s\x1b[0m', `${DELTAS} Enemy: ${result[0].deployId} is getting closer to Friendly unit: ${user.deployId}`)
                                 console.log('\x1b[33m%s\x1b[0m', `${DELTAS} Emitting ENEMY_CLOSER_${user.deployId}`);
+                                io.getio().emit("ENEMY_CLOSER_"+user.deployId, {enemy: result[result.length-1], bearing: bearing, distance: distance2});
                                 let deltas = new Deltas({
                                     deployId: `${user.deployId}`,
                                     message: 'ENEMY_CLOSER',
@@ -72,7 +73,7 @@ amqp.connect('amqp://qfrftznl:gVWftNle39STIm0A2Gdclre7Nja4W5Qk@orangutan.rmq.clo
                                 }
                                 )
                                 deltas.save().then(res => {
-                                    io.getio().emit("ENEMY_CLOSER_"+user.deployId, {enemy: result[result.length-1], bearing: bearing, distance: distance2});
+                                    console.log("Deltas saved")
                                 })
                                 .catch(err => { console.log(err); })
                             }
