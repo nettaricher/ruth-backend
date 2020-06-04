@@ -8,7 +8,7 @@ API_ENDPOINT_ADD = "https://fierce-everglades-47378.herokuapp.com/report/"
 API_DELETE = "https://fierce-everglades-47378.herokuapp.com/deploys/delete/"
 API_DELTAS_DELETE = "https://fierce-everglades-47378.herokuapp.com/deltas/delete/"
 FIELDS = 5
-REPORTS_CSV = "deploys.csv"
+REPORTS_CSV = "deploys1.csv"
 
 value = input("Please choose mode: ")
 
