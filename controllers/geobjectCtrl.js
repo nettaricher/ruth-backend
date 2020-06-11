@@ -18,7 +18,8 @@ module.exports = {
             location = null,
             height = null,
             additionalInfo = null,
-            tag = null
+            tag = null,
+            category = null
         } = req.body
         Geobject.find({objectId: objectId})
         .then(result => {
