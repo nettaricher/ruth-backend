@@ -10,7 +10,8 @@ var geobject = new mongoose.Schema({
         height: Number,
         additionalInfo: String,
         tag: [String],
-        category: String
+        category: String,
+        deploys: []
     })
 
 geobject.index( { location: "2dsphere" } )

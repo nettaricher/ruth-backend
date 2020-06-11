@@ -39,6 +39,7 @@ module.exports = {
       amount = null,
       tag = null,
       deployType = null,
+      objectId = null
     } = req.body;
     Deploy.find({ deployId: deployId })
       .then((result) => {
@@ -58,6 +59,7 @@ module.exports = {
             tag,
             deployType,
             is_valid,
+            objectId
           });
           deploy
             .save()
@@ -65,7 +67,7 @@ module.exports = {
               io.getio().emit('SEND_LOCATION', [deploy]);
               if (deployType === 'Enemy') {
                 publishToQueue('deltas-surrounding', result.deployId);
-                if (tag === 'Human') {
+                if (tag === 'EnemyHuman') {
                   publishToQueue('suspect-building', result.deployId);
                 }
               }
@@ -144,6 +146,7 @@ module.exports = {
                 tag: obj.tag,
                 deployType: obj.deployType,
                 is_valid: true,
+                objectId: obj.objectId
               });
               newDeploy
                 .save()
@@ -152,7 +155,7 @@ module.exports = {
                   if ((result.deployType === 'Enemy') || (result.deployType === 'EnemyHuman')){
                     publishToQueue('deltas-distance', result.deployId);
                     publishToQueue('deltas-surrounding', result.deployId);
-                    if (result.tag === 'Human') {
+                    if (result.tag === 'EnemyHuman') {
                         publishToQueue('suspect-building', result.deployId);
                     }
                   }

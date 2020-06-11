@@ -12,6 +12,17 @@ module.exports = {
         })
     },
 
+    fetchGeoById(req, res, next) {
+        const { id = null } = req.params;
+        Geobject.find({objectId: id})
+          .then((result) => {
+            res.json(result);
+          })
+          .catch((err) => {
+            res.status(404).send('not found');
+          });
+      },
+
     addGeoObject(req, res, next){
         const{
             objectId = null,
@@ -19,7 +30,8 @@ module.exports = {
             height = null,
             additionalInfo = null,
             tag = null,
-            category = null
+            category = null,
+            deploys = null
         } = req.body
         Geobject.find({objectId: objectId})
         .then(result => {
@@ -27,7 +39,7 @@ module.exports = {
                 res.status(406).json({message: "Geo Object id is already exist, to update please use /geoObject/update/" + objectId})
             }
             else {
-                const geoObject = new Geobject({objectId, location, height, additionalInfo, tag})
+                const geoObject = new Geobject({objectId, location, height, additionalInfo, tag, category, deploys})
                 geoObject.save()
                 .then(result => {
                     res.status(201).json(result)

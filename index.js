@@ -39,6 +39,7 @@ app.get("/deltas/:id", deltaCtrl.fetchDeltasById);
 app.delete("/deltas/delete", deltaCtrl.deleteDeltas);
 app.post("/report", deployCtrl.addDeploy);
 app.get("/geobject", geobjectCtrl.fetchAllGeobjects);
+app.get("/geoObject/:id", geobjectCtrl.fetchGeoById);
 app.post("/geoObject", geobjectCtrl.addGeoObject);
 app.get("/geoObject", geobjectCtrl.addGeoObject);
 //app.patch('/geoObject/update/:id', geobjectCtrl.updateGeoObjectById)

@@ -22,7 +22,8 @@ var deploy = new mongoose.Schema({
             default: Date.now
         },
         nearObject: [],
-        is_valid: Boolean
+        is_valid: Boolean,
+        objectId: String
     })
 
 deploy.index({ location: "2dsphere" })
