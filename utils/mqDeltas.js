@@ -261,8 +261,9 @@ amqp.connect('amqp://qfrftznl:gVWftNle39STIm0A2Gdclre7Nja4W5Qk@orangutan.rmq.clo
                                     data: [obj[0]]
                                 })
                                 deltas.save().then(res => {
-                                    console.log('\x1b[33m%s\x1b[0m', "Emitting io less-suspect-building - id: "+ obj[0].objectId)
-                                    io.getio().emit("less-suspect-building", obj[0])
+                                    console.log('\x1b[33m%s\x1b[0m', "Emitting io less-suspect-building: ")
+                                    console.log({data: obj[0], timestamp: Date.now})
+                                    io.getio().emit("less-suspect-building", {data: obj[0], timestamp: Date.now})
                                 })
                                 .catch(err => { console.log(err); })
                                 Deploy.updateOne({deployId: enemy[0].deployId, is_valid: true}, {objectId: null})
@@ -302,7 +303,8 @@ amqp.connect('amqp://qfrftznl:gVWftNle39STIm0A2Gdclre7Nja4W5Qk@orangutan.rmq.clo
                             })
                             deltas.save().then(res => {
                                 console.log('\x1b[33m%s\x1b[0m', "Emitting io suspect-building - id: "+ result[0].objectId)
-                                io.getio().emit("suspect-building", result[0])
+                                console.log({data: result[0], timestamp: Date.now})
+                                io.getio().emit("suspect-building", {data: result[0], timestamp: Date.now})
                             })
                             .catch(err => { console.log(err); })
                         }
