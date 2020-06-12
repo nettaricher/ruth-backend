@@ -244,6 +244,7 @@ amqp.connect('amqp://qfrftznl:gVWftNle39STIm0A2Gdclre7Nja4W5Qk@orangutan.rmq.clo
                             console.log("Removing deploy from object" + enemy[0].objectId)
                             GeoObject.find({objectId: enemy[0].objectId})
                             .then(obj => {
+                                let toSplice
                                 obj[0].deploys.forEach((deploy, i) => {
                                     if (deploy.deployId === enemy[0].deployId)
                                         toSplice = i
@@ -254,12 +255,21 @@ amqp.connect('amqp://qfrftznl:gVWftNle39STIm0A2Gdclre7Nja4W5Qk@orangutan.rmq.clo
                                 .then(res => {
                                     console.log("Removing enemy " + enemy[0].deployId + "from geoObject")
                                 })
+                                let deltas = new Deltas({
+                                    deployId: obj[0].objectId,
+                                    message: 'less-suspect-building',
+                                    data: [obj[0]]
+                                })
+                                deltas.save().then(res => {
+                                    console.log('\x1b[33m%s\x1b[0m', "Emitting io less-suspect-building - id: "+ obj[0].objectId)
+                                    io.getio().emit("less-suspect-building", obj[0])
+                                })
+                                .catch(err => { console.log(err); })
                                 Deploy.updateOne({deployId: enemy[0].deployId, is_valid: true}, {objectId: null})
                                 .then(res => {
                                     console.log("Removing object from enemy")
                                 })
-                            })
-                            
+                            })                            
                         }
                     } else {
                         let exists = false
@@ -277,13 +287,24 @@ amqp.connect('amqp://qfrftznl:gVWftNle39STIm0A2Gdclre7Nja4W5Qk@orangutan.rmq.clo
                             newDeplys.push(enemy[0])
                             GeoObject.updateOne({objectId: result[0].objectId}, {deploys: newDeplys})
                             .then(res => {
-                                console.log("Updated obj " + res)
+                                console.log("Updated obj ")
                             })
                             console.log("updating deploy id " + enemy[0].deployId)
                             Deploy.updateOne({deployId: enemy[0].deployId, is_valid: true}, {objectId: result[0].objectId})
                             .then(res => {
                                 console.log("Updated enemy deploy ")
                             })
+                            result[0].deploys = newDeplys
+                            let deltas = new Deltas({
+                                deployId: result[0].objectId,
+                                message: 'suspect-building',
+                                data: [result[0]]
+                            })
+                            deltas.save().then(res => {
+                                console.log('\x1b[33m%s\x1b[0m', "Emitting io suspect-building - id: "+ result[0].objectId)
+                                io.getio().emit("suspect-building", result[0])
+                            })
+                            .catch(err => { console.log(err); })
                         }
                     }
                     // console.log("updating " + enemy[0].deployId + " with objects")
