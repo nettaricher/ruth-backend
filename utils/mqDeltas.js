@@ -227,129 +227,59 @@ amqp.connect('amqp://qfrftznl:gVWftNle39STIm0A2Gdclre7Nja4W5Qk@orangutan.rmq.clo
             console.log(" [x] Received %s", msg.content.toString());
             Deploy.find({deployId: msg.content, is_valid: true})
             .then(enemy => {
+                Deploy.find(
+                {
+                    location: {
+                        $near: {
+                            $maxDistance: 10000,
+                            $geometry:  {
+                                type: "Point",
+                                coordinates: enemy[0].location.coordinates
+                        }
+                    }
+                },
+                deployType: "Friendly",
+                is_valid: true
+                })
+                .then(units => {
+                    console.log("Found " + units.length + " friendly units")
+                    units.forEach(unit => {
+                        console.log('\x1b[33m%s\x1b[0m', "Emitting io ENEMY_SPOTTED_"+ unit.deployId)
+                        io.getio().emit("ENEMY_SPOTTED_"+unit.deployId, enemy[0])
+                    })
+                })
                 GeoObject.find({location: {
                     $near: {
-                        $maxDistance: 0,
+                        $maxDistance: 30,
                         $geometry:  {
                             type: "Point",
                             coordinates: enemy[0].location.coordinates
                         }
                     }
                 } })
-                .then(result => {
-                    console.log("Found " + result.length + " objects")
-                    if (result.length === 0){
-                        if (enemy[0].objectId != null) {
-                            console.log("Removing deploy from object" + enemy[0].objectId)
-                            GeoObject.find({objectId: enemy[0].objectId})
-                            .then(obj => {
-                                let toSplice
-                                obj[0].deploys.forEach((deploy, i) => {
-                                    if (deploy.deployId === enemy[0].deployId)
-                                        toSplice = i
-                                })
-                                console.log("Splicing ...")
-                                obj[0].deploys.splice(toSplice, 1);
-                                GeoObject.updateOne({objectId: enemy[0].objectId},{deploys: obj[0].deploys})
-                                .then(res => {
-                                    console.log("Removing enemy " + enemy[0].deployId + "from geoObject")
-                                })
-                                let deltas = new Deltas({
-                                    deployId: obj[0].objectId,
-                                    message: 'less-suspect-building',
-                                    data: [obj[0]]
-                                })
-                                deltas.save().then(res => {
-                                    console.log('\x1b[33m%s\x1b[0m', "Emitting io less-suspect-building: ")
-                                    console.log({data: obj[0], timestamp: Date.now})
-                                    io.getio().emit("less-suspect-building", {data: obj[0], timestamp: Date.now})
-                                })
-                                .catch(err => { console.log(err); })
-                                Deploy.updateOne({deployId: enemy[0].deployId, is_valid: true}, {objectId: null})
-                                .then(res => {
-                                    console.log("Removing object from enemy")
-                                })
-                            })                            
+                .then(buildings => {
+                    let res = []
+                    console.log("Found suspect buildings:")
+                    buildings.forEach((building)=> {
+                        console.log(building.objectId)
+                        switch(building.objectId){
+                            case "36":
+                            case "45":
+                                res.push({objectId: building.objectId, riskLevel: "HIGH"})
+                                break;
+                            case "49":
+                                res.push({objectId: building.objectId, riskLevel: "MEDIUM"})
+                                break;
+                            default:
+                                res.push({objectId: building.objectId, riskLevel: "LOW"})
                         }
-                    } else {
-                        let exists = false
-                        if (result[0].deploys ){
-                            result[0].deploys.forEach(enemydeploy => {
-                                if (enemydeploy.deployId === enemy[0].deployId){
-                                    console.log("Skipping.")
-                                    exists = true
-                                }
-                            })
-                        }
-                        if (!exists){
-                            console.log("Updating object: " + result[0].objectId)
-                            let newDeplys = result[0].deploys
-                            newDeplys.push(enemy[0])
-                            GeoObject.updateOne({objectId: result[0].objectId}, {deploys: newDeplys})
-                            .then(res => {
-                                console.log("Updated obj ")
-                            })
-                            console.log("updating deploy id " + enemy[0].deployId)
-                            Deploy.updateOne({deployId: enemy[0].deployId, is_valid: true}, {objectId: result[0].objectId})
-                            .then(res => {
-                                console.log("Updated enemy deploy ")
-                            })
-                            result[0].deploys = newDeplys
-                            let deltas = new Deltas({
-                                deployId: result[0].objectId,
-                                message: 'suspect-building',
-                                data: [result[0]]
-                            })
-                            deltas.save().then(res => {
-                                console.log('\x1b[33m%s\x1b[0m', "Emitting io suspect-building - id: "+ result[0].objectId)
-                                console.log({data: result[0], timestamp: Date.now})
-                                io.getio().emit("suspect-building", {data: result[0], timestamp: Date.now})
-                            })
-                            .catch(err => { console.log(err); })
-                        }
-                    }
-                    // console.log("updating " + enemy[0].deployId + " with objects")
-                    // Deploy.updateOne({deployId: enemy[0].deployId, is_valid: true} , {nearObject: result})
-                    // .then(res => { 
-                    //     //console.log("***")
-                    // })
-                    // .catch(err => {})
-                //     let validDate = new Date(enemy[0].timestamp)
-                //     Deploy.find({deployId: enemy[0].deployId, is_valid: false}).sort({timestamp: -1})
-                //     .then(deploys => {
-                //         console.log("comparing with " + deploys.length + " reports")
-                //         let objectsIds = []
-                //         deploys.forEach(element => {
-                //             let invalidDate = new Date(element.timestamp)
-                //             if (validDate - invalidDate > 600000) {
-                //                 element.nearObject.forEach(obj => {
-                //                     result.forEach(validObj => {
-                //                         if(validObj.objectId === obj.objectId){
-                //                             objectsIds.push(validObj.objectId)
-                //                         }
-                //                     })
-                //                 })
-                //             }
-                //         })
-                //         let objSet = new Set(objectsIds)
-                //         console.log("suspicious object ids set -> ")
-                //         console.log(objSet)
-                //         let res = []
-                //         objSet.forEach(obj => res.push(obj))
-                //         if (objSet.size > 0) {
-                //             console.log('\x1b[33m%s\x1b[0m', "Emitting io SUSPECT-BUILDING")
-                //             console.log(res)
-                //             io.getio().emit("SUSPECT-BUILDING",res)
-                //         }
-                //     })
-                // .catch(err => {
-                //     console.log(err)
-                // })
+                    })
+                    console.log('\x1b[33m%s\x1b[0m', "Emitting io SUSPECT_BUILDINGS with:")
+                    console.log(res)
+                    io.getio().emit("SUSPECT_BUILDINGS", res)
+                })
             })
-        })
-            .catch(err => {
-                console.log(err)
-            })
+            .catch(e => {console.log(e)})
         }, 
         {
             noAck: true

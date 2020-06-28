@@ -155,7 +155,7 @@ module.exports = {
                   if ((result.deployType === 'Enemy') || (result.deployType === 'EnemyHuman')){
                     publishToQueue('deltas-distance', result.deployId);
                     publishToQueue('deltas-surrounding', result.deployId);
-                    if (result.tag === 'EnemyHuman') {
+                    if (result.tag === 'Human') {
                         publishToQueue('suspect-building', result.deployId);
                     }
                   }
