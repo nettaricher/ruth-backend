@@ -65,9 +65,9 @@ module.exports = {
             .save()
             .then((result) => {
               io.getio().emit('SEND_LOCATION', [deploy]);
-              if (deployType === 'Enemy') {
+              if (deployType === 'Enemy' || deployType === 'EnemyHuman') {
                 publishToQueue('deltas-surrounding', result.deployId);
-                if (tag === 'EnemyHuman') {
+                if (tag === 'EnemyHuman' || tag === 'Troop') {
                   publishToQueue('suspect-building', result.deployId);
                 }
               }
@@ -125,6 +125,7 @@ module.exports = {
 
   updateDeployById(req, res, next) {
     const deploys = req.body;
+    console.log(deploys)
     let length = deploys.length;
     let counter = 0;
     let prev = null;
@@ -134,6 +135,7 @@ module.exports = {
     deploys.forEach((deploy, i) => {
       Deploy.findOne({ deployId: deploy.deployId, is_valid: true })
         .then((obj) => {
+          console.log(obj)
           Deploy.updateOne({ deployId: deploy.deployId, is_valid: true }, { is_valid: false })
             .then((result) => {
               const newDeploy = new Deploy({
@@ -155,7 +157,7 @@ module.exports = {
                   if ((result.deployType === 'Enemy') || (result.deployType === 'EnemyHuman')){
                     publishToQueue('deltas-distance', result.deployId);
                     publishToQueue('deltas-surrounding', result.deployId);
-                    if (result.tag === 'Human') {
+                    if ((result.tag === 'Human') || (result.tag === 'Troop')) {
                         publishToQueue('suspect-building', result.deployId);
                     }
                   }
