@@ -125,6 +125,7 @@ module.exports = {
 
   updateDeployById(req, res, next) {
     const deploys = req.body;
+    console.log(deploys)
     let length = deploys.length;
     let counter = 0;
     let prev = null;
@@ -134,6 +135,7 @@ module.exports = {
     deploys.forEach((deploy, i) => {
       Deploy.findOne({ deployId: deploy.deployId, is_valid: true })
         .then((obj) => {
+          console.log(obj)
           Deploy.updateOne({ deployId: deploy.deployId, is_valid: true }, { is_valid: false })
             .then((result) => {
               const newDeploy = new Deploy({
